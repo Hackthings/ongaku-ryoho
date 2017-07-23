@@ -141,7 +141,9 @@ content resultant ( sortBy, sortDirection, isProcessing, sources ) =
         , onScroll (ScrollThroughTable >> TopLevel.TracksMsg)
         , id "tracks"
         ]
-        [ if List.isEmpty resultant then
+        [ -- No results
+          --
+          if List.isEmpty resultant then
             div
                 []
                 [ div
@@ -170,8 +172,11 @@ content resultant ( sortBy, sortDirection, isProcessing, sources ) =
                     [ cssClass LogoBackdrop ]
                     []
                 ]
+            -- The results
+            --
           else
-            tracksTable resultant sortBy sortDirection
+            -- tracksTable resultant sortBy sortDirection
+            tracksGrid resultant sortBy sortDirection
         ]
 
 
@@ -221,7 +226,7 @@ msgNoTracks =
 
 
 
--- Content views
+-- {view} Table
 
 
 tracksTable : List IdentifiedTrack -> SortBy -> SortDirection -> Html TopLevel.Msg
@@ -285,6 +290,41 @@ tracksTableItem index ( identifiers, track ) =
             , td [] [ text track.tags.artist ]
             , td [] [ text track.tags.album ]
             ]
+        )
+
+
+
+-- {view} Grid
+
+
+tracksGrid : List IdentifiedTrack -> SortBy -> SortDirection -> Html TopLevel.Msg
+tracksGrid tracks activeSortBy sortDirection =
+    Html.Keyed.node
+        "div"
+        []
+        (List.indexedMap
+            (\idx ( identifiers, track ) ->
+                ( toString idx
+                , div
+                    [ style
+                        [ ( "height", "100px" )
+                        , ( "width", "100px" )
+                        , ( "float", "left" )
+                        , ( "background-size", "cover" )
+                        , ( "background-image"
+                          , case track.tags.picture of
+                                Just pictureDataUri ->
+                                    "url(" ++ pictureDataUri ++ ")"
+
+                                Nothing ->
+                                    "none"
+                          )
+                        ]
+                    ]
+                    []
+                )
+            )
+            tracks
         )
 
 
